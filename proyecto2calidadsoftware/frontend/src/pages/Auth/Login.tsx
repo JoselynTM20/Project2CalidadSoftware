@@ -131,21 +131,6 @@ const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="card">
-          <div className="card-body">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Credenciales de Demo</h3>
-            <div className="space-y-2 text-sm text-gray-600">
-              <div>
-                <strong>SuperAdmin:</strong> admin / Admin123!
-              </div>
-              <div className="text-xs text-gray-500">
-                ⚠️ Cambia la contraseña después del primer login
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Footer */}
         <div className="text-center text-sm text-gray-500">
           <p>Sistema de Gestión de Productos con Medidas de Seguridad</p>
