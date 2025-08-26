@@ -15,7 +15,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   isAuthenticated: false,
   user: null,
   token: null,
-  isLoading: false,
+  isLoading: true, // Cambiar a true por defecto para mostrar loading inicial
 
   login: async (username: string, password: string) => {
     try {
@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         permissions: response.user.permissions
       };
       
-      secureSessionStorage.setItem('user', safeUserData);
+      secureSessionStorage.setItem('user', JSON.stringify(safeUserData));
       
       set({
         isAuthenticated: true,
@@ -58,7 +58,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Clear all sensitive data
       clearSensitiveData();
       
-      // Clear state
+      // Clear state and storage
       get().clearAuth();
     }
   },
@@ -67,32 +67,50 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
       
-      // Get token from secure storage
+      // Get token and user from secure storage
       const token = secureSessionStorage.getItem('token');
-      if (!token) {
-        set({ isLoading: false });
+      const storedUser = secureSessionStorage.getItem('user');
+      
+      if (!token || !storedUser) {
+        set({ isLoading: false, isAuthenticated: false });
         return;
       }
 
-      // Verify token with backend
-      const user = await authApi.getCurrentUser();
-      
-      // Update secure storage with fresh data
-      const safeUserData = {
-        id: user.id,
-        username: user.username,
-        roleName: user.roleName,
-        permissions: user.permissions
-      };
-      
-      secureSessionStorage.setItem('user', safeUserData);
-      
-      set({
-        isAuthenticated: true,
-        user,
-        token,
-        isLoading: false,
-      });
+      try {
+        // Parse stored user data
+        const userData = JSON.parse(storedUser);
+        
+        // Set initial state from storage (para evitar flash de login)
+        set({
+          isAuthenticated: true,
+          user: userData,
+          token,
+          isLoading: true,
+        });
+
+        // Verify token with backend
+        const user = await authApi.getCurrentUser();
+        
+        // Update secure storage with fresh data
+        const safeUserData = {
+          id: user.id,
+          username: user.username,
+          roleName: user.roleName,
+          permissions: user.permissions
+        };
+        
+        secureSessionStorage.setItem('user', JSON.stringify(safeUserData));
+        
+        set({
+          isAuthenticated: true,
+          user,
+          token,
+          isLoading: false,
+        });
+      } catch (parseError) {
+        console.error('Error parsing stored user data:', parseError);
+        get().clearAuth();
+      }
     } catch (error) {
       console.error('Auth check failed:', error);
       get().clearAuth();
@@ -100,6 +118,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   clearAuth: () => {
+    // Limpiar storage
+    secureSessionStorage.removeItem('token');
+    secureSessionStorage.removeItem('user');
+    
     set({
       isAuthenticated: false,
       user: null,

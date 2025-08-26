@@ -102,11 +102,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, user, onLogout, onExtendSe
                              </span>
                            ))}
                          </div>
-                         {/* Debug: Mostrar permisos exactos */}
-                         <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
-                           <p className="font-medium text-gray-700">Debug - Permisos exactos:</p>
-                           <code className="text-gray-600">{JSON.stringify(user.permissions, null, 2)}</code>
-                         </div>
+
                        </div>
                      )}
                   </div>

@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { query } = require('../config/database');
-const { checkPermission } = require('../middleware/auth');
+const { checkResourcePermission } = require('../middleware/auth');
 const sanitizeHtml = require('sanitize-html');
 
 const router = express.Router();
@@ -39,8 +39,8 @@ const productValidation = [
     .withMessage('El precio debe ser un número positivo mayor a 0')
 ];
 
-// GET /api/products - Listar productos (requiere permiso view_reports)
-router.get('/', checkPermission('view_reports'), async (req, res) => {
+// GET /api/products - Listar productos (requiere permiso view_products)
+router.get('/', checkResourcePermission('products', 'view'), async (req, res) => {
   try {
     const productsResult = await query(
       `SELECT p.id, p.code, p.name, p.description, p.quantity, p.price, 
@@ -61,8 +61,8 @@ router.get('/', checkPermission('view_reports'), async (req, res) => {
   }
 });
 
-// GET /api/products/:id - Obtener producto específico (requiere permiso view_reports)
-router.get('/:id', checkPermission('view_reports'), async (req, res) => {
+// GET /api/products/:id - Obtener producto específico (requiere permiso view_products)
+router.get('/:id', checkResourcePermission('products', 'view'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -90,8 +90,8 @@ router.get('/:id', checkPermission('view_reports'), async (req, res) => {
   }
 });
 
-// POST /api/products - Crear producto (requiere permiso create)
-router.post('/', checkPermission('create'), productValidation, async (req, res) => {
+// POST /api/products - Crear producto (requiere permiso create_products)
+router.post('/', checkResourcePermission('products', 'create'), productValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -146,8 +146,8 @@ router.post('/', checkPermission('create'), productValidation, async (req, res) 
   }
 });
 
-// PUT /api/products/:id - Editar producto (requiere permiso edit)
-router.put('/:id', checkPermission('edit'), productValidation, async (req, res) => {
+// PUT /api/products/:id - Editar producto (requiere permiso edit_products)
+router.put('/:id', checkResourcePermission('products', 'edit'), productValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -265,8 +265,8 @@ router.put('/:id', checkPermission('edit'), productValidation, async (req, res) 
   }
 });
 
-// DELETE /api/products/:id - Eliminar producto (requiere permiso delete)
-router.delete('/:id', checkPermission('delete'), async (req, res) => {
+// DELETE /api/products/:id - Eliminar producto (requiere permiso delete_products)
+router.delete('/:id', checkResourcePermission('products', 'delete'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -291,8 +291,8 @@ router.delete('/:id', checkPermission('delete'), async (req, res) => {
   }
 });
 
-// GET /api/products/search/:query - Buscar productos (requiere permiso view_reports)
-router.get('/search/:query', checkPermission('view_reports'), async (req, res) => {
+// GET /api/products/search/:query - Buscar productos (requiere permiso view_products)
+router.get('/search/:query', checkResourcePermission('products', 'view'), async (req, res) => {
   try {
     const { query: searchQuery } = req.params;
 
@@ -321,8 +321,8 @@ router.get('/search/:query', checkPermission('view_reports'), async (req, res) =
   }
 });
 
-// GET /api/products/stats/summary - Estadísticas de productos (requiere permiso view_reports)
-router.get('/stats/summary', checkPermission('view_reports'), async (req, res) => {
+// GET /api/products/stats/summary - Estadísticas de productos (requiere permiso view_products)
+router.get('/stats/summary', checkResourcePermission('products', 'view'), async (req, res) => {
   try {
     const statsResult = await query(`
       SELECT 

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const { query } = require('../config/database');
-const { isSuperAdmin, checkPermission } = require('../middleware/auth');
+const { isSuperAdmin, checkResourcePermission, checkViewOnlyPermission } = require('../middleware/auth');
 const sanitizeHtml = require('sanitize-html');
 
 const router = express.Router();
@@ -34,8 +34,8 @@ const userValidation = [
     .withMessage('El ID del rol debe ser un número entero válido')
 ];
 
-// GET /api/users - Listar usuarios (requiere permiso view_reports)
-router.get('/', checkPermission('view_reports'), async (req, res) => {
+// GET /api/users - Listar usuarios (requiere permiso view_users)
+router.get('/', checkResourcePermission('users', 'view'), async (req, res) => {
   try {
     const usersResult = await query(
       `SELECT u.id, u.username, u.role_id, r.name as role_name, u.last_login, u.created_at
@@ -55,8 +55,8 @@ router.get('/', checkPermission('view_reports'), async (req, res) => {
   }
 });
 
-// GET /api/users/:id - Obtener usuario específico (requiere permiso view_reports)
-router.get('/:id', checkPermission('view_reports'), async (req, res) => {
+// GET /api/users/:id - Obtener usuario específico (requiere permiso view_users)
+router.get('/:id', checkResourcePermission('users', 'view'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -83,8 +83,8 @@ router.get('/:id', checkPermission('view_reports'), async (req, res) => {
   }
 });
 
-// POST /api/users - Crear usuario (solo SuperAdmin)
-router.post('/', isSuperAdmin, userValidation, async (req, res) => {
+// POST /api/users - Crear usuario (requiere permiso create_users)
+router.post('/', checkResourcePermission('users', 'create'), userValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -146,8 +146,8 @@ router.post('/', isSuperAdmin, userValidation, async (req, res) => {
   }
 });
 
-// PUT /api/users/:id - Editar usuario (solo SuperAdmin)
-router.put('/:id', isSuperAdmin, userValidation, async (req, res) => {
+// PUT /api/users/:id - Editar usuario (requiere permiso edit_users)
+router.put('/:id', checkResourcePermission('users', 'edit'), userValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -258,8 +258,8 @@ router.put('/:id', isSuperAdmin, userValidation, async (req, res) => {
   }
 });
 
-// DELETE /api/users/:id - Eliminar usuario (solo SuperAdmin)
-router.delete('/:id', isSuperAdmin, async (req, res) => {
+// DELETE /api/users/:id - Eliminar usuario (requiere permiso delete_users)
+router.delete('/:id', checkResourcePermission('users', 'delete'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -290,7 +290,7 @@ router.delete('/:id', isSuperAdmin, async (req, res) => {
 });
 
 // GET /api/users/:id/permissions - Obtener permisos de un usuario
-router.get('/:id/permissions', checkPermission('view_reports'), async (req, res) => {
+router.get('/:id/permissions', checkResourcePermission('users', 'view'), async (req, res) => {
   try {
     const { id } = req.params;
 

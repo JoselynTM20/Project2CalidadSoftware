@@ -29,14 +29,14 @@ const RolePermissions: React.FC<RolePermissionsProps> = ({ role, onClose, onUpda
 
   useEffect(() => {
     fetchAvailablePermissions();
-    // Inicializar permisos seleccionados con los que ya tiene el rol
+  
     setSelectedPermissions(role.permissions.map(p => p.id));
   }, [role]);
 
   const fetchAvailablePermissions = async () => {
     try {
       setLoading(true);
-      // Aquí deberías tener un endpoint para obtener todos los permisos disponibles
+     
       const permissions = await rolesApi.getAvailablePermissions();
       setAvailablePermissions(permissions);
     } catch (error) {
@@ -59,28 +59,7 @@ const RolePermissions: React.FC<RolePermissionsProps> = ({ role, onClose, onUpda
       setSaving(true);
       const result = await rolesApi.updateRolePermissions(role.id, selectedPermissions);
       
-      // Mostrar mensaje de éxito con advertencia
-      if (result.warning) {
-        const message = `✅ ${result.message}
-
-${result.warning}
-
-📋 Permisos actualizados:
-${result.permissionNames?.join('\n• ') || 'Ninguno'}
-
-👥 Usuarios afectados: ${result.affectedUsers}
-
-⚠️ IMPORTANTE: Los usuarios con este rol deberán cerrar sesión y volver a iniciar para que los nuevos permisos se activen.
-
-🔄 Para ver los cambios inmediatamente:
-1. Cierra sesión en todas las pestañas/ventanas
-2. Vuelve a iniciar sesión
-3. Los nuevos permisos estarán activos`;
-        
-        alert(message);
-      } else {
-        alert(`✅ ${result.message}`);
-      }
+      // No mostrar ningún mensaje de alerta
       
       onUpdate();
       onClose();

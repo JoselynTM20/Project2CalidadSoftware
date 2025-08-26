@@ -61,15 +61,24 @@ const Layout: React.FC = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home, permission: 'view_reports' },
-    { name: 'Usuarios', href: '/users', icon: Users, permission: 'view_reports' },
-    { name: 'Productos', href: '/products', icon: Package, permission: 'view_reports' },
-    { name: 'Roles', href: '/roles', icon: Shield, permission: 'view_reports' },
+    { name: 'Usuarios', href: '/users', icon: Users, permission: 'view_users' },
+    { name: 'Productos', href: '/products', icon: Package, permission: 'view_products' },
+    { name: 'Roles', href: '/roles', icon: Shield, permission: 'view_roles' },
   ].filter(item => {
-    // Filtrar según el rol del usuario
-    if (item.name === 'Roles' && user?.roleName === 'Registrador') {
-      return false; // Registrador no puede ver Roles
+    // Verificar si el usuario tiene el permiso específico para cada sección
+    if (item.name === 'Usuarios') {
+      return user?.permissions.includes('view_users') || user?.permissions.includes('view_reports');
     }
-    return user?.permissions.includes(item.permission);
+    if (item.name === 'Productos') {
+      return user?.permissions.includes('view_products') || user?.permissions.includes('view_reports');
+    }
+    if (item.name === 'Roles') {
+      return user?.permissions.includes('view_roles') || user?.permissions.includes('view_reports');
+    }
+    if (item.name === 'Dashboard') {
+      return user?.permissions.includes('view_reports');
+    }
+    return false;
   });
 
   return (

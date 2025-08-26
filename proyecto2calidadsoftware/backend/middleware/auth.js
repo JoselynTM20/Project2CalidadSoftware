@@ -90,6 +90,41 @@ const checkPermission = (requiredPermission) => {
   };
 };
 
+// Middleware para verificar permisos específicos por recurso
+const checkResourcePermission = (resource, action) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Usuario no autenticado' });
+      }
+
+      const requiredPermission = `${action}_${resource}`;
+      
+      // Verificar si el usuario tiene el permiso específico
+      const permissionResult = await query(
+        `SELECT COUNT(*) as count
+         FROM role_permissions rp
+         JOIN permissions p ON rp.permission_id = p.id
+         WHERE rp.role_id = $1 AND p.name = $2`,
+        [req.user.roleId, requiredPermission]
+      );
+
+      if (parseInt(permissionResult.rows[0].count) === 0) {
+        return res.status(403).json({ 
+          message: `No tienes permisos para ${action} ${resource}`,
+          requiredPermission,
+          userRole: req.user.roleName
+        });
+      }
+
+      next();
+    } catch (error) {
+      console.error('Error verificando permisos del recurso:', error);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+};
+
 // Middleware para verificar si es SuperAdmin
 const isSuperAdmin = async (req, res, next) => {
   try {
@@ -153,10 +188,44 @@ const isRegistrador = async (req, res, next) => {
   }
 };
 
+// Middleware para verificar permisos de solo lectura (view only)
+const checkViewOnlyPermission = (resource) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Usuario no autenticado' });
+      }
+
+      // Si es Registrador, solo puede ver ciertos recursos
+      if (req.user.roleName === 'Registrador') {
+        const allowedResources = ['users', 'roles', 'permissions'];
+        if (allowedResources.includes(resource)) {
+          // Solo permitir operaciones GET (ver)
+          if (req.method !== 'GET') {
+            return res.status(403).json({ 
+              message: `Los Registradores solo pueden ver ${resource}, no modificarlos`,
+              userRole: req.user.roleName
+            });
+          }
+          return next();
+        }
+      }
+
+      // Para otros roles, verificar permisos normales
+      next();
+    } catch (error) {
+      console.error('Error verificando permisos de solo lectura:', error);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+};
+
 module.exports = {
   authenticateToken,
   checkPermission,
+  checkResourcePermission,
   isSuperAdmin,
   isAuditor,
-  isRegistrador
+  isRegistrador,
+  checkViewOnlyPermission
 };

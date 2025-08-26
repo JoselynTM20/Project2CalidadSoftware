@@ -51,6 +51,25 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredPermi
 };
 
 function App() {
+  const { checkAuth, isAuthenticated, isLoading } = useAuthStore();
+
+  // Verificar autenticación al cargar la aplicación
+  React.useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -93,23 +112,23 @@ function App() {
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               
-              {/* Users - Requires view_reports permission */}
+              {/* Users - Requires view_users permission */}
               <Route path="users" element={
-                <ProtectedRoute requiredPermissions={['view_reports']}>
+                <ProtectedRoute requiredPermissions={['view_users', 'view_reports']}>
                   <Users />
                 </ProtectedRoute>
               } />
               
-              {/* Products - Requires view_reports permission */}
+              {/* Products - Requires view_products permission */}
               <Route path="products" element={
-                <ProtectedRoute requiredPermissions={['view_reports']}>
+                <ProtectedRoute requiredPermissions={['view_products', 'view_reports']}>
                   <Products />
                 </ProtectedRoute>
               } />
               
-              {/* Roles - Requires view_reports permission */}
+              {/* Roles - Requires view_roles permission */}
               <Route path="roles" element={
-                <ProtectedRoute requiredPermissions={['view_reports']}>
+                <ProtectedRoute requiredPermissions={['view_roles', 'view_reports']}>
                   <Roles />
                 </ProtectedRoute>
               } />

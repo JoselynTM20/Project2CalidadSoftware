@@ -30,7 +30,7 @@ const Roles: React.FC = () => {
   const canCreateRoles = () => currentUser?.permissions?.includes('create') || currentUser?.permissions?.includes('create_roles') || false;
   const canEditRoles = () => currentUser?.permissions?.includes('edit') || currentUser?.permissions?.includes('edit_roles') || false;
   const canDeleteRoles = () => currentUser?.permissions?.includes('delete') || currentUser?.permissions?.includes('delete_roles') || false;
-  const canManagePermissions = () => currentUser?.permissions?.includes('manage_permissions') || currentUser?.permissions?.includes('edit') || false;
+  const canManagePermissions = () => currentUser?.permissions?.includes('edit_roles') || currentUser?.permissions?.includes('edit') || false;
   const canViewRoles = () => currentUser?.permissions?.includes('view') || currentUser?.permissions?.includes('view_roles') || currentUser?.permissions?.includes('view_reports') || false;
 
   useEffect(() => {

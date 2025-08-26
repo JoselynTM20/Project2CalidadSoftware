@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
       setStats({
         totalUsers: users.length,
         totalProducts: products.length,
-        totalRoles: 4, // Roles fijos: SuperAdmin, Admin, Auditor, Registrador
+        totalRoles: 4, 
         lowStockProducts,
         recentUsers,
         recentProducts,

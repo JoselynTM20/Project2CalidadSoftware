@@ -32,7 +32,32 @@ const Login: React.FC = () => {
       toast.success('¡Inicio de sesión exitoso!');
       navigate('/dashboard');
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Error al iniciar sesión';
+      console.log('Error completo:', error); // Para debugging
+      
+      let message = 'Error al iniciar sesión';
+      
+             // Manejar específicamente errores de Axios
+       if (error.response) {
+         // Error con respuesta del servidor
+         if (error.response.status === 429) {
+           // Rate limiting - el mensaje viene directamente en error.response.data
+           message = error.response.data || 'Error de rate limiting';
+         } else if (error.response.data?.message) {
+           message = error.response.data.message;
+         } else if (error.response.data) {
+           // Si no hay .message, usar directamente error.response.data
+           message = error.response.data;
+         } else {
+           message = `Error ${error.response.status}: ${error.response.statusText}`;
+         }
+       } else if (error.request) {
+        // Error de red (sin respuesta del servidor)
+        message = 'Error de conexión. Verifique su conexión a internet.';
+      } else if (error.message) {
+        // Error general
+        message = error.message;
+      }
+      
       toast.error(message);
     }
   };

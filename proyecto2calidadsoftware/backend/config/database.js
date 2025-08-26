@@ -19,15 +19,6 @@ const pool = new Pool({
   query_timeout: 30000, // 30 segundos máximo por query
 });
 
-// Evento de conexión exitosa
-pool.on('connect', (client) => {
-  console.log('🔌 Nueva conexión a PostgreSQL establecida');
-});
-
-// Evento de error en la conexión
-pool.on('error', (err, client) => {
-  console.error('❌ Error en el pool de conexiones PostgreSQL:', err);
-});
 
 // Función para ejecutar queries de forma segura
 const query = async (text, params) => {
@@ -38,7 +29,6 @@ const query = async (text, params) => {
     
     const res = await pool.query(text, params);
     const duration = Date.now() - start;
-    console.log(`📊 Query ejecutada en ${duration}ms:`, text.substring(0, 50) + '...');
     return res;
   } catch (error) {
     console.error('❌ Error ejecutando query:', error);

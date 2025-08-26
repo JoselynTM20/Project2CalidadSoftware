@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { query } = require('../config/database');
-const { isSuperAdmin, checkPermission } = require('../middleware/auth');
+const { isSuperAdmin, checkResourcePermission, checkViewOnlyPermission } = require('../middleware/auth');
 const sanitizeHtml = require('sanitize-html');
 
 const router = express.Router();
@@ -41,8 +41,8 @@ const permissionAssignmentValidation = [
     .withMessage('Cada ID de permiso debe ser un número entero válido')
 ];
 
-// GET /api/roles - Listar roles (requiere permiso view_reports)
-router.get('/', checkPermission('view_reports'), async (req, res) => {
+// GET /api/roles - Listar roles (requiere permiso view_roles)
+router.get('/', checkResourcePermission('roles', 'view'), async (req, res) => {
   try {
     const rolesResult = await query(
       `SELECT r.id, r.name, r.description, r.created_at,
@@ -83,7 +83,7 @@ router.get('/', checkPermission('view_reports'), async (req, res) => {
 });
 
 // GET /api/roles/available/permissions - Obtener todos los permisos disponibles
-router.get('/available/permissions', checkPermission('view_reports'), async (req, res) => {
+router.get('/available/permissions', checkResourcePermission('roles', 'view'), async (req, res) => {
   try {
     const permissionsResult = await query(
       'SELECT id, name, description FROM permissions ORDER BY name'
@@ -100,8 +100,8 @@ router.get('/available/permissions', checkPermission('view_reports'), async (req
   }
 });
 
-// GET /api/roles/:id - Obtener rol específico (requiere permiso view_reports)
-router.get('/:id', checkPermission('view_reports'), async (req, res) => {
+// GET /api/roles/:id - Obtener rol específico (requiere permiso view_roles)
+router.get('/:id', checkResourcePermission('roles', 'view'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -142,8 +142,8 @@ router.get('/:id', checkPermission('view_reports'), async (req, res) => {
   }
 });
 
-// POST /api/roles - Crear rol (solo SuperAdmin)
-router.post('/', isSuperAdmin, roleValidation, async (req, res) => {
+// POST /api/roles - Crear rol (requiere permiso create_roles)
+router.post('/', checkResourcePermission('roles', 'create'), roleValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -192,8 +192,8 @@ router.post('/', isSuperAdmin, roleValidation, async (req, res) => {
   }
 });
 
-// PUT /api/roles/:id - Editar rol (solo SuperAdmin)
-router.put('/:id', isSuperAdmin, roleValidation, async (req, res) => {
+// PUT /api/roles/:id - Editar rol (requiere permiso edit_roles)
+router.put('/:id', checkResourcePermission('roles', 'edit'), roleValidation, async (req, res) => {
   try {
     // Verificar errores de validación
     const errors = validationResult(req);
@@ -378,7 +378,7 @@ router.post('/:id/permissions', isSuperAdmin, permissionAssignmentValidation, as
 });
 
 // GET /api/roles/:id/permissions - Obtener permisos de un rol
-router.get('/:id/permissions', checkPermission('view_reports'), async (req, res) => {
+router.get('/:id/permissions', checkResourcePermission('roles', 'view'), async (req, res) => {
   try {
     const { id } = req.params;
 
