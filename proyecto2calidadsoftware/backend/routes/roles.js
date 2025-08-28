@@ -6,11 +6,19 @@ const sanitizeHtml = require('sanitize-html');
 
 const router = express.Router();
 
-// Función para sanitizar inputs
+// Función para sanitizar inputs - Permite HTML pero bloquea scripts
 const sanitizeInput = (input) => {
   return sanitizeHtml(input, {
-    allowedTags: [],
-    allowedAttributes: {}
+    allowedTags: [
+      'b', 'i', 'em', 'strong', 'a', 'p', 'br', 'span', 'div'
+    ],
+    allowedAttributes: {
+      'a': ['href', 'title'],
+      'span': ['class'],
+      'div': ['class']
+    },
+    // Bloquear scripts y eventos peligrosos
+    allowedSchemes: ['http', 'https', 'mailto', 'tel']
   });
 };
 
