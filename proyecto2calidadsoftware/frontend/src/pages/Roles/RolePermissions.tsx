@@ -79,13 +79,7 @@ const RolePermissions: React.FC<RolePermissionsProps> = ({ role, onClose, onUpda
     return 'General';
   };
 
-  const getPermissionIcon = (permissionName: string) => {
-    if (permissionName.includes('create')) return '➕';
-    if (permissionName.includes('edit')) return '✏️';
-    if (permissionName.includes('delete')) return '🗑️';
-    if (permissionName.includes('view')) return '👁️';
-    return '🔧';
-  };
+
 
   if (loading) {
     return (
@@ -152,7 +146,6 @@ const RolePermissions: React.FC<RolePermissionsProps> = ({ role, onClose, onUpda
                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-lg">{getPermissionIcon(permission.name)}</span>
                           <div>
                             <p className="font-medium text-gray-900 capitalize">
                               {permission.name.replace(/_/g, ' ')}
