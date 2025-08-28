@@ -23,10 +23,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const response = await authApi.login({ username, password });
       
-      // Store token securely in sessionStorage (se borra al cerrar navegador)
+     
       secureSessionStorage.setItem('token', response.token);
       
-      // Store minimal user info securely (solo datos no sensibles)
+    
       const safeUserData = {
         id: response.user.id,
         username: response.user.username,

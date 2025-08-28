@@ -16,21 +16,26 @@ const sanitizeInput = (input) => {
     allowedAttributes: {
       'a': ['href', 'title', 'target'],
       'img': ['src', 'alt', 'title', 'width', 'height'],
-      'span': ['class', 'style'],
-      'div': ['class', 'style'],
-      'p': ['class', 'style']
-    },
-    // Bloquear scripts y eventos peligrosos
-    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-    // No permitir JavaScript en ningún atributo
-    allowedSchemesByTag: {},
-    // Bloquear eventos como onclick, onload, etc.
-    allowedAttributes: {
-      'a': ['href', 'title', 'target'],
-      'img': ['src', 'alt', 'title', 'width', 'height'],
       'span': ['class'],
       'div': ['class'],
       'p': ['class']
+    },
+    // Bloquear scripts y eventos peligrosos
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    // Convertir tags peligrosos en texto
+    transformTags: {
+      'script': function(tagName, attribs) {
+        return {
+          tagName: 'span',
+          text: `<${tagName}>${attribs.text || ''}</${tagName}>`
+        };
+      },
+      'iframe': function(tagName, attribs) {
+        return {
+          tagName: 'span',
+          text: `<${tagName}>${attribs.text || ''}</${tagName}>`
+        };
+      }
     }
   });
 };
