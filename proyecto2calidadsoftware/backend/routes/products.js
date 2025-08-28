@@ -6,37 +6,11 @@ const sanitizeHtml = require('sanitize-html');
 
 const router = express.Router();
 
-// Función para sanitizar inputs - Permite HTML pero bloquea scripts
+// Función para sanitizar inputs
 const sanitizeInput = (input) => {
   return sanitizeHtml(input, {
-    allowedTags: [
-      'b', 'i', 'em', 'strong', 'a', 'p', 'br', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'mark', 'small', 'sub', 'sup'
-    ],
-    allowedAttributes: {
-      'a': ['href', 'title', 'target'],
-      'img': ['src', 'alt', 'title', 'width', 'height'],
-      'span': ['class'],
-      'div': ['class'],
-      'p': ['class']
-    },
-    // Bloquear scripts y eventos peligrosos
-    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-    // Convertir tags peligrosos en texto
-    transformTags: {
-      'script': function(tagName, attribs) {
-        return {
-          tagName: 'span',
-          text: `<${tagName}>${attribs.text || ''}</${tagName}>`
-        };
-      },
-      'iframe': function(tagName, attribs) {
-        return {
-          tagName: 'span',
-          text: `<${tagName}>${attribs.text || ''}</${tagName}>`
-        };
-      }
-    }
+    allowedTags: [],
+    allowedAttributes: {}
   });
 };
 

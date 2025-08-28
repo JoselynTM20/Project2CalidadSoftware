@@ -101,11 +101,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  name: 'sessionId', // Cambiar nombre por defecto de la cookie
+  name: 'sessionId', 
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS only en producción
-    httpOnly: true, // No accesible desde JavaScript
-    sameSite: 'strict', // Prevenir CSRF
+    secure: process.env.NODE_ENV === 'production', 
+    httpOnly: true, 
+    sameSite: 'strict', 
     maxAge: 60 * 1000, // 1 minuto de inactividad como especifica el requerimiento
     path: '/',
     domain: process.env.NODE_ENV === 'production' ? '.tudominio.com' : undefined

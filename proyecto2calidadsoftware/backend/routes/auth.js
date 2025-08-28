@@ -38,19 +38,11 @@ const registerValidation = [
     .withMessage('El ID del rol debe ser un número entero válido')
 ];
 
-// Función para sanitizar inputs - Permite HTML pero bloquea scripts
+// Función para sanitizar inputs
 const sanitizeInput = (input) => {
   return sanitizeHtml(input, {
-    allowedTags: [
-      'b', 'i', 'em', 'strong', 'a', 'p', 'br', 'span', 'div'
-    ],
-    allowedAttributes: {
-      'a': ['href', 'title'],
-      'span': ['class'],
-      'div': ['class']
-    },
-    // Bloquear scripts y eventos peligrosos
-    allowedSchemes: ['http', 'https', 'mailto', 'tel']
+    allowedTags: [],
+    allowedAttributes: {}
   });
 };
 
